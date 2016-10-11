@@ -10,7 +10,7 @@ function assertSingleActor(d, alias, name) {
 	equal(a.index, 0, "Actors A's index");
 }
 
-function assertSingleArrow(d, arrowtype, linetype, actorA, actorB, message) {
+function assertSingleArrow(d, left_arrowtype, right_arrowtype, linetype, actorA, actorB, message) {
 
 	actorA = actorA || "A";
 	actorB = actorB || "B";
@@ -30,7 +30,8 @@ function assertSingleArrow(d, arrowtype, linetype, actorA, actorB, message) {
 
 	equal(d.signals[0].message, message, "Signal message");
 
-	equal(d.signals[0].arrowtype, arrowtype, "Arrowhead type");
+	equal(d.signals[0].right_arrowtype, right_arrowtype, "Right arrowhead type");
+	equal(d.signals[0].left_arrowtype, left_arrowtype, "Left arrowhead type");
 	equal(d.signals[0].linetype, linetype, "Line type");
 }
 
@@ -91,24 +92,54 @@ test("Regex Tests", function() {
 });
 */
 
-test( "Solid Arrow", function() {
+test( "Solid Right Arrow", function() {
 	var d = Diagram.parse("A->B: Message");
-	assertSingleArrow(d, ARROWTYPE.FILLED, LINETYPE.SOLID);
+	assertSingleArrow(d, ARROWTYPE.NONE, ARROWTYPE.FILLED, LINETYPE.SOLID);
 });
 
-test( "Dashed Arrow", function() {
+test( "Dashed Right Arrow", function() {
 	var d = Diagram.parse("A-->B: Message");
-	assertSingleArrow(d, ARROWTYPE.FILLED, LINETYPE.DOTTED);
+	assertSingleArrow(d, ARROWTYPE.NONE, ARROWTYPE.FILLED, LINETYPE.DOTTED);
 });
 
-test( "Solid Open Arrow", function() {
+test( "Solid Right Open Arrow", function() {
 	var d = Diagram.parse("A->>B: Message");
-	assertSingleArrow(d, ARROWTYPE.OPEN, LINETYPE.SOLID);
+	assertSingleArrow(d, ARROWTYPE.NONE, ARROWTYPE.OPEN, LINETYPE.SOLID);
 });
 
-test( "Dashed Open Arrow", function() {
+test( "Dashed Right Open Arrow", function() {
 	var d = Diagram.parse("A-->>B: Message");
-	assertSingleArrow(d, ARROWTYPE.OPEN, LINETYPE.DOTTED);
+	assertSingleArrow(d, ARROWTYPE.NONE, ARROWTYPE.OPEN, LINETYPE.DOTTED);
+});
+
+test( "Solid Left Arrow", function() {
+	var d = Diagram.parse("A<-B: Message");
+	assertSingleArrow(d, ARROWTYPE.FILLED, ARROWTYPE.NONE, LINETYPE.SOLID);
+});
+
+test( "Dashed Left Arrow", function() {
+	var d = Diagram.parse("A<--B: Message");
+	assertSingleArrow(d, ARROWTYPE.FILLED, ARROWTYPE.NONE, LINETYPE.DOTTED);
+});
+
+test( "Solid Left Open Arrow", function() {
+	var d = Diagram.parse("A<<-B: Message");
+	assertSingleArrow(d, ARROWTYPE.OPEN, ARROWTYPE.NONE, LINETYPE.SOLID);
+});
+
+test( "Dashed Left Open Arrow", function() {
+	var d = Diagram.parse("A<<--B: Message");
+	assertSingleArrow(d, ARROWTYPE.OPEN, ARROWTYPE.NONE, LINETYPE.DOTTED);
+});
+
+test( "Sold Both Arrow", function() {
+	var d = Diagram.parse("A<->B: Message");
+	assertSingleArrow(d, ARROWTYPE.FILLED, ARROWTYPE.FILLED, LINETYPE.SOLID);
+});
+
+test( "Dashed Both Open Arrow", function() {
+	var d = Diagram.parse("A<<-->>B: Message");
+	assertSingleArrow(d, ARROWTYPE.OPEN, ARROWTYPE.OPEN, LINETYPE.DOTTED);
 });
 
 test( "Titles", function() {
@@ -131,10 +162,13 @@ test( "Empty documents", function() {
 });
 
 test( "Whitespace", function() {
-	assertSingleArrow(Diagram.parse("  A  -  > B  : Message  "), ARROWTYPE.FILLED, LINETYPE.SOLID);
-	assertSingleArrow(Diagram.parse("\n\nA->B: Message\n\n"), ARROWTYPE.FILLED, LINETYPE.SOLID);
+	assertSingleArrow(Diagram.parse("  A  -  > B  : Message  "), ARROWTYPE.NONE, ARROWTYPE.FILLED, LINETYPE.SOLID);
+	assertSingleArrow(Diagram.parse("  A <  -  B  : Message  "), ARROWTYPE.FILLED, ARROWTYPE.NONE, LINETYPE.SOLID);
+	assertSingleArrow(Diagram.parse("\n\nA->B: Message\n\n"), ARROWTYPE.NONE, ARROWTYPE.FILLED, LINETYPE.SOLID);
+	assertSingleArrow(Diagram.parse("\n\nA<-B: Message\n\n"), ARROWTYPE.FILLED, ARROWTYPE.NONE, LINETYPE.SOLID);
 
 	assertSingleActor(Diagram.parse("  A  -> A: blah"), "A");
+	assertSingleActor(Diagram.parse("  A <-  A: blah"), "A");
 });
 
 test( "Comments", function() {
@@ -145,9 +179,12 @@ test( "Comments", function() {
 	assertEmptyDocument(Diagram.parse("# A->B: Title"));
 
 	// If # is encountered elsewhere, it is part of the names
-	assertSingleArrow(Diagram.parse("A#->B: Message"), ARROWTYPE.FILLED, LINETYPE.SOLID, "A#", "B");
-	assertSingleArrow(Diagram.parse("A->B#: Message"), ARROWTYPE.FILLED, LINETYPE.SOLID, "A", "B#");
-	assertSingleArrow(Diagram.parse("A->B: Message # not a comment"), ARROWTYPE.FILLED, LINETYPE.SOLID, "A", "B", "Message # not a comment");
+	assertSingleArrow(Diagram.parse("A#->B: Message"), ARROWTYPE.NONE, ARROWTYPE.FILLED, LINETYPE.SOLID, "A#", "B");
+	assertSingleArrow(Diagram.parse("A#<-B: Message"), ARROWTYPE.FILLED, ARROWTYPE.NONE, LINETYPE.SOLID, "A#", "B");
+	assertSingleArrow(Diagram.parse("A->B#: Message"), ARROWTYPE.NONE, ARROWTYPE.FILLED, LINETYPE.SOLID, "A", "B#");
+	assertSingleArrow(Diagram.parse("A<-B#: Message"), ARROWTYPE.FILLED, ARROWTYPE.NONE, LINETYPE.SOLID, "A", "B#");
+	assertSingleArrow(Diagram.parse("A->B: Message # not a comment"), ARROWTYPE.NONE, ARROWTYPE.FILLED, LINETYPE.SOLID, "A", "B", "Message # not a comment");
+	assertSingleArrow(Diagram.parse("A<-B: Message # not a comment"), ARROWTYPE.FILLED, ARROWTYPE.NONE, LINETYPE.SOLID, "A", "B", "Message # not a comment");
 
 	equal(Diagram.parse("Title: title # not a comment").title, "title # not a comment");
 	assertSingleNote(Diagram.parse("note left of A: Message # not a comment"), PLACEMENT.LEFTOF, "A", "Message # not a comment");
@@ -182,8 +219,8 @@ test( "Newlines", function() {
 });
 
 test( "Quoted names", function() {
-	assertSingleArrow(Diagram.parse("\"->:\"->B: M"), ARROWTYPE.FILLED, LINETYPE.SOLID, "->:", "B", "M");
-	assertSingleArrow(Diagram.parse("A->\"->:\": M"), ARROWTYPE.FILLED, LINETYPE.SOLID, "A", "->:", "M");
+	assertSingleArrow(Diagram.parse("\"->:\"->B: M"), ARROWTYPE.NONE, ARROWTYPE.FILLED, LINETYPE.SOLID, "->:", "B", "M");
+	assertSingleArrow(Diagram.parse("A->\"->:\": M"), ARROWTYPE.NONE, ARROWTYPE.FILLED, LINETYPE.SOLID, "A", "->:", "M");
 	assertSingleActor(Diagram.parse("Participant \"->:\""), "->:");
 });
 

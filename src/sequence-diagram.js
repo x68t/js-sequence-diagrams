@@ -483,8 +483,19 @@
 			y = offsetY + signal.height - SIGNAL_MARGIN - SIGNAL_PADDING;
 			var line = this.draw_line(aX, y, bX, y);
 			line.attr(LINE);
+			var arrowtype = signal.right_arrowtype;
+			if (arrowtype) {
+				line.attr({
+					'arrow-end': this.arrow_types[arrowtype] + '-wide-long'
+				});
+			}
+			arrowtype = signal.left_arrowtype;
+			if (arrowtype) {
+				line.attr({
+					'arrow-start': this.arrow_types[arrowtype] + '-wide-long'
+				});
+			}
 			line.attr({
-				'arrow-end': this.arrow_types[signal.arrowtype] + '-wide-long',
 				'stroke-dasharray': this.line_types[signal.linetype]
 			});
 

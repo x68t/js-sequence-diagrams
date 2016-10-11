@@ -23,12 +23,14 @@
 "note"            return 'note';
 "title"           return 'title';
 ","               return ',';
-[^\->:,\r\n"]+    return 'ACTOR';
+[^\-<>:,\r\n"]+   return 'ACTOR';
 \"[^"]+\"         return 'ACTOR';
 "--"              return 'DOTLINE';
 "-"               return 'LINE';
-">>"              return 'OPENARROW';
-">"               return 'ARROW';
+">>"              return 'RIGHT_OPENARROW';
+">"               return 'RIGHT_ARROW';
+"<<"              return 'LEFT_OPENARROW';
+"<"               return 'LEFT_ARROW';
 :[^\r\n]+         return 'MESSAGE';
 <<EOF>>           return 'EOF';
 .                 return 'INVALID';
@@ -89,8 +91,10 @@ actor_alias
 	;
 
 signaltype
-	: linetype arrowtype  { $$ = $1 | ($2 << 2); }
-	| linetype            { $$ = $1; }
+	:                linetype                 { $$ = $1; }
+	|                linetype right_arrowtype { $$ = $1 | ($2 << 2); }
+	| left_arrowtype linetype                 { $$ = ($1 << 4) | $2; }
+	| left_arrowtype linetype right_arrowtype { $$ = ($1 << 4) | $2 | ($3 << 2); }
 	;
 
 linetype
@@ -98,9 +102,14 @@ linetype
 	| DOTLINE   { $$ = Diagram.LINETYPE.DOTTED; }
 	;
 
-arrowtype
-	: ARROW     { $$ = Diagram.ARROWTYPE.FILLED; }
-	| OPENARROW { $$ = Diagram.ARROWTYPE.OPEN; }
+right_arrowtype
+	: RIGHT_ARROW     { $$ = Diagram.ARROWTYPE.FILLED; }
+	| RIGHT_OPENARROW { $$ = Diagram.ARROWTYPE.OPEN; }
+	;
+
+left_arrowtype
+	: LEFT_ARROW     { $$ = Diagram.ARROWTYPE.FILLED; }
+	| LEFT_OPENARROW { $$ = Diagram.ARROWTYPE.OPEN; }
 	;
 
 message

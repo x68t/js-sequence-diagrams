@@ -60,12 +60,13 @@
 	};
 
 	Diagram.Signal = function(actorA, signaltype, actorB, message) {
-		this.type       = "Signal";
-		this.actorA     = actorA;
-		this.actorB     = actorB;
-		this.linetype   = signaltype & 3;
-		this.arrowtype  = (signaltype >> 2) & 3;
-		this.message    = message;
+		this.type             = "Signal";
+		this.actorA           = actorA;
+		this.actorB           = actorB;
+		this.linetype         = signaltype & 3;
+		this.right_arrowtype  = (signaltype >> 2) & 3;
+		this.left_arrowtype   = (signaltype >> 4) & 3;
+		this.message          = message;
 	};
 
 	Diagram.Signal.prototype.isSelf = function() {
@@ -98,8 +99,9 @@
 	};
 
 	Diagram.ARROWTYPE = {
-		FILLED  : 0,
-		OPEN    : 1
+		NONE    : 0,
+		FILLED  : 1,
+		OPEN    : 2
 	};
 
 	Diagram.PLACEMENT = {
