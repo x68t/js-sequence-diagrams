@@ -458,13 +458,21 @@
 			// Draw three lines, the last one with a arrow
 			var line;
 			line = this.draw_line(aX, y1, aX + SELF_SIGNAL_WIDTH, y1);
+			var arrowtype = signal.left_arrowtype;
+			if (arrowtype)
+				attr['arrow-start'] = this.arrow_types[arrowtype] + '-wide-long';
 			line.attr(attr);
 
+			attr = _.extend({}, LINE, {
+				'stroke-dasharray': this.line_types[signal.linetype]
+			});
 			line = this.draw_line(aX + SELF_SIGNAL_WIDTH, y1, aX + SELF_SIGNAL_WIDTH, y2);
 			line.attr(attr);
 
 			line = this.draw_line(aX + SELF_SIGNAL_WIDTH, y2, aX, y2);
-			attr['arrow-end'] = this.arrow_types[signal.arrowtype] + '-wide-long';
+			arrowtype = signal.right_arrowtype;
+			if (arrowtype)
+				attr['arrow-end'] = this.arrow_types[arrowtype] + '-wide-long';
 			line.attr(attr);
 		},
 
