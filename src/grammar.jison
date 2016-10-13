@@ -28,9 +28,11 @@
 "--"              return 'DOTLINE';
 "-"               return 'LINE';
 ">o"              return 'RIGHT_OVALARROW';
+">#"              return 'RIGHT_DIAMONDARROW';
 ">>"              return 'RIGHT_OPENARROW';
 ">"               return 'RIGHT_ARROW';
 "<o"              return 'LEFT_OVALARROW';
+"<#"              return 'LEFT_DIAMONDARROW';
 "<<"              return 'LEFT_OPENARROW';
 "<"               return 'LEFT_ARROW';
 :[^\r\n]+         return 'MESSAGE';
@@ -93,7 +95,7 @@ actor_alias
 	;
 
 signaltype
-	: left_arrowtype linetype right_arrowtype { $$ = ($1 << 4) | $2 | ($3 << 2); }
+	: left_arrowtype linetype right_arrowtype { $$ = ($1 << 8) | $2 | ($3 << 4); }
 	;
 
 linetype
@@ -102,10 +104,11 @@ linetype
 	;
 
 right_arrowtype
-    :                 { $$ = Diagram.ARROWTYPE.NONE; }
-	| RIGHT_ARROW     { $$ = Diagram.ARROWTYPE.FILLED; }
-	| RIGHT_OPENARROW { $$ = Diagram.ARROWTYPE.OPEN; }
-	| RIGHT_OVALARROW { $$ = Diagram.ARROWTYPE.OVAL; }
+    :                    { $$ = Diagram.ARROWTYPE.NONE; }
+	| RIGHT_ARROW        { $$ = Diagram.ARROWTYPE.FILLED; }
+	| RIGHT_OPENARROW    { $$ = Diagram.ARROWTYPE.OPEN; }
+	| RIGHT_OVALARROW    { $$ = Diagram.ARROWTYPE.OVAL; }
+	| RIGHT_DIAMONDARROW { $$ = Diagram.ARROWTYPE.DIAMOND; }
 	;
 
 left_arrowtype
@@ -113,6 +116,7 @@ left_arrowtype
 	| LEFT_ARROW     { $$ = Diagram.ARROWTYPE.FILLED; }
 	| LEFT_OPENARROW { $$ = Diagram.ARROWTYPE.OPEN; }
 	| LEFT_OVALARROW { $$ = Diagram.ARROWTYPE.OVAL; }
+	| LEFT_DIAMONDARROW { $$ = Diagram.ARROWTYPE.DIAMOND; }
 	;
 
 message

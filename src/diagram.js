@@ -63,9 +63,9 @@
 		this.type             = "Signal";
 		this.actorA           = actorA;
 		this.actorB           = actorB;
-		this.linetype         = signaltype & 3;
-		this.right_arrowtype  = (signaltype >> 2) & 3;
-		this.left_arrowtype   = (signaltype >> 4) & 3;
+		this.linetype         = signaltype & 15;
+		this.right_arrowtype  = (signaltype >> 4) & 15;
+		this.left_arrowtype   = (signaltype >> 8) & 15;
 		this.message          = message;
 	};
 
@@ -102,7 +102,8 @@
 		NONE    : 0,
 		FILLED  : 1,
 		OPEN    : 2,
-		OVAL    : 3
+		OVAL    : 3,
+		DIAMOND : 4
 	};
 
 	Diagram.PLACEMENT = {

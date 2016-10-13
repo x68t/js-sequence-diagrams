@@ -192,9 +192,10 @@
 			this._signals_height = 0;
 
 			var a = this.arrow_types = {};
-			a[ARROWTYPE.FILLED] = 'block';
-			a[ARROWTYPE.OPEN]   = 'open';
-			a[ARROWTYPE.OVAL]   = 'oval';
+			a[ARROWTYPE.FILLED]  = 'block';
+			a[ARROWTYPE.OPEN]    = 'open';
+			a[ARROWTYPE.OVAL]    = 'oval';
+			a[ARROWTYPE.DIAMOND] = 'diamond';
 
 			var l = this.line_types = {};
 			l[LINETYPE.SOLID]  = '';

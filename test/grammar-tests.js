@@ -152,6 +152,16 @@ test( "Dashed Left Oval Arrow", function() {
 	assertSingleArrow(d, ARROWTYPE.OVAL, ARROWTYPE.NONE, LINETYPE.DOTTED);
 });
 
+test( "Solid Right Diamond Arrow", function() {
+	var d = Diagram.parse("A -># B: Message");
+	assertSingleArrow(d, ARROWTYPE.NONE, ARROWTYPE.DIAMOND, LINETYPE.SOLID);
+});
+
+test( "Dashed Left Diamond Arrow", function() {
+	var d = Diagram.parse("A <#-- B: Message");
+	assertSingleArrow(d, ARROWTYPE.DIAMOND, ARROWTYPE.NONE, LINETYPE.DOTTED);
+});
+
 test( "Titles", function() {
 	equal(Diagram.parse("Title: title").title, "title", "Title");
 	equal(Diagram.parse("Title: line1\\nline2").title, "line1\nline2", "Multiline Title");
