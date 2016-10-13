@@ -91,10 +91,7 @@ actor_alias
 	;
 
 signaltype
-	:                linetype                 { $$ = $1; }
-	|                linetype right_arrowtype { $$ = $1 | ($2 << 2); }
-	| left_arrowtype linetype                 { $$ = ($1 << 4) | $2; }
-	| left_arrowtype linetype right_arrowtype { $$ = ($1 << 4) | $2 | ($3 << 2); }
+	: left_arrowtype linetype right_arrowtype { $$ = ($1 << 4) | $2 | ($3 << 2); }
 	;
 
 linetype
@@ -103,12 +100,14 @@ linetype
 	;
 
 right_arrowtype
-	: RIGHT_ARROW     { $$ = Diagram.ARROWTYPE.FILLED; }
+    :                 { $$ = Diagram.ARROWTYPE.NONE; }
+	| RIGHT_ARROW     { $$ = Diagram.ARROWTYPE.FILLED; }
 	| RIGHT_OPENARROW { $$ = Diagram.ARROWTYPE.OPEN; }
 	;
 
 left_arrowtype
-	: LEFT_ARROW     { $$ = Diagram.ARROWTYPE.FILLED; }
+    :                { $$ = Diagram.ARROWTYPE.NONE; }
+	| LEFT_ARROW     { $$ = Diagram.ARROWTYPE.FILLED; }
 	| LEFT_OPENARROW { $$ = Diagram.ARROWTYPE.OPEN; }
 	;
 
