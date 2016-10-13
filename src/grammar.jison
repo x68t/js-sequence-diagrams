@@ -27,8 +27,10 @@
 \"[^"]+\"         return 'ACTOR';
 "--"              return 'DOTLINE';
 "-"               return 'LINE';
+">o"              return 'RIGHT_OVALARROW';
 ">>"              return 'RIGHT_OPENARROW';
 ">"               return 'RIGHT_ARROW';
+"<o"              return 'LEFT_OVALARROW';
 "<<"              return 'LEFT_OPENARROW';
 "<"               return 'LEFT_ARROW';
 :[^\r\n]+         return 'MESSAGE';
@@ -103,12 +105,14 @@ right_arrowtype
     :                 { $$ = Diagram.ARROWTYPE.NONE; }
 	| RIGHT_ARROW     { $$ = Diagram.ARROWTYPE.FILLED; }
 	| RIGHT_OPENARROW { $$ = Diagram.ARROWTYPE.OPEN; }
+	| RIGHT_OVALARROW { $$ = Diagram.ARROWTYPE.OVAL; }
 	;
 
 left_arrowtype
     :                { $$ = Diagram.ARROWTYPE.NONE; }
 	| LEFT_ARROW     { $$ = Diagram.ARROWTYPE.FILLED; }
 	| LEFT_OPENARROW { $$ = Diagram.ARROWTYPE.OPEN; }
+	| LEFT_OVALARROW { $$ = Diagram.ARROWTYPE.OVAL; }
 	;
 
 message

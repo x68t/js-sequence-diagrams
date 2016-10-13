@@ -194,6 +194,7 @@
 			var a = this.arrow_types = {};
 			a[ARROWTYPE.FILLED] = 'block';
 			a[ARROWTYPE.OPEN]   = 'open';
+			a[ARROWTYPE.OVAL]   = 'oval';
 
 			var l = this.line_types = {};
 			l[LINETYPE.SOLID]  = '';

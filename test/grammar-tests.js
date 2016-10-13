@@ -142,6 +142,16 @@ test( "Dashed Both Open Arrow", function() {
 	assertSingleArrow(d, ARROWTYPE.OPEN, ARROWTYPE.OPEN, LINETYPE.DOTTED);
 });
 
+test( "Solid Right Oval Arrow", function() {
+	var d = Diagram.parse("A ->o B: Message");
+	assertSingleArrow(d, ARROWTYPE.NONE, ARROWTYPE.OVAL, LINETYPE.SOLID);
+});
+
+test( "Dashed Left Oval Arrow", function() {
+	var d = Diagram.parse("A <o-- B: Message");
+	assertSingleArrow(d, ARROWTYPE.OVAL, ARROWTYPE.NONE, LINETYPE.DOTTED);
+});
+
 test( "Titles", function() {
 	equal(Diagram.parse("Title: title").title, "title", "Title");
 	equal(Diagram.parse("Title: line1\\nline2").title, "line1\nline2", "Multiline Title");

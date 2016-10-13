@@ -101,7 +101,8 @@
 	Diagram.ARROWTYPE = {
 		NONE    : 0,
 		FILLED  : 1,
-		OPEN    : 2
+		OPEN    : 2,
+		OVAL    : 3
 	};
 
 	Diagram.PLACEMENT = {
