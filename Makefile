@@ -1,9 +1,12 @@
-.PHONY : all test dependencies clean veryclean lint
+.PHONY : all test dependencies clean veryclean lint js css font
 
 NODE_MODULES := node_modules/.bin
 BOWER_COMPONENTS := bower_components
 
-all: node_modules lint build/sequence-diagram-min.js test
+all: lint js css test
+js: dist/sequence-diagram-min.js dist/sequence-diagram-raphael-min.js dist/sequence-diagram-snap-min.js
+css: dist/sequence-diagram-min.css font
+font: dist/danielbd.woff2 dist/danielbd.woff
 
 node_modules: package.json
 	#
@@ -23,6 +26,7 @@ dependencies: node_modules bower_components
 
 clean:
 	-rm build/*
+	-git checkout -- dist
 
 veryclean: clean
 	-rm -rf node_modules
@@ -34,33 +38,38 @@ lint: dependencies package.json bower.json
 	$(NODE_MODULES)/jsonlint package.json -q
 	$(NODE_MODULES)/jsonlint bower.json -q
 
-test: dependencies build/sequence-diagram-min.js
+	$(NODE_MODULES)/jsonlint .jscsrc -q
+	$(NODE_MODULES)/jscs --fix src/*.js
+	$(NODE_MODULES)/jscs --fix test/*.js
+
+test: dependencies dist/sequence-diagram-min.js
 
 	# Test the un-minifed file (with underscore)
 	$(NODE_MODULES)/qunit \
-		-c build/sequence-diagram.js \
+		-c dist/sequence-diagram.js \
 		-t test/*-tests.js \
-		-d test/raphael-mock.js $(BOWER_COMPONENTS)/underscore/underscore-min.js
+		-d test/*-mock.js $(BOWER_COMPONENTS)/underscore/underscore-min.js
 
 	# Test the un-minifed file (with lodash)
 	$(NODE_MODULES)/qunit \
-		-c build/sequence-diagram.js \
+		-c dist/sequence-diagram.js \
 		-t test/*-tests.js \
-		-d test/raphael-mock.js $(BOWER_COMPONENTS)/lodash/dist/lodash.min.js
+		-d test/*-mock.js $(BOWER_COMPONENTS)/lodash/dist/lodash.min.js
 
 	# Test the minifed file (with underscore)
 	$(NODE_MODULES)/qunit \
-		-c build/sequence-diagram-min.js \
+		-c dist/sequence-diagram-min.js \
 		-t test/*-tests.js \
-		-d test/raphael-mock.js $(BOWER_COMPONENTS)/underscore/underscore-min.js
+		-d test/*-mock.js $(BOWER_COMPONENTS)/underscore/underscore-min.js
 
 	# Test the minifed file (with lodash)
 	$(NODE_MODULES)/qunit \
-		-c build/sequence-diagram-min.js \
+		-c dist/sequence-diagram-min.js \
 		-t test/*-tests.js \
-		-d test/raphael-mock.js $(BOWER_COMPONENTS)/lodash/dist/lodash.min.js
+		-d test/*-mock.js $(BOWER_COMPONENTS)/lodash/dist/lodash.min.js
 
 build/grammar.js: src/grammar.jison
+	mkdir -p build
 	$(NODE_MODULES)/jison $< -o $@.tmp
 
 	# After building the grammar, run it through the uglifyjs to fix some non-strict issues.
@@ -69,30 +78,47 @@ build/grammar.js: src/grammar.jison
 		$@.tmp -o $@ \
 		--comments all --compress --beautify
 
+	rm $@.tmp
+
+# Compile the grammar
 build/diagram-grammar.js: src/diagram.js build/grammar.js
-	#
-	# Compiling grammar
-	#
 	$(NODE_MODULES)/preprocess $< . > $@
 
-build/sequence-diagram.js: src/main.js build/diagram-grammar.js src/jquery-plugin.js fonts/daniel/daniel_700.font.js src/sequence-diagram.js
-	#
-	# Finally combine all javascript files together
-	#
-	$(NODE_MODULES)/preprocess $< . > $@
+# Combine all javascript files together (Raphael and Snap.svg)
+dist/sequence-diagram.js: src/main.js build/diagram-grammar.js src/jquery-plugin.js src/sequence-diagram.js src/theme.js src/theme-snap.js src/theme-raphael.js fonts/daniel/daniel_700.font.js
+	mkdir -p dist
+	$(NODE_MODULES)/preprocess $< . -SNAP=true -RAPHAEL=true  > $@
 
-build/sequence-diagram-min.js build/sequence-diagram-min.js.map: build/sequence-diagram.js
+# Combine just Raphael theme
+dist/sequence-diagram-raphael.js: src/main.js build/diagram-grammar.js src/jquery-plugin.js src/sequence-diagram.js src/theme.js src/theme-raphael.js fonts/daniel/daniel_700.font.js
+	$(NODE_MODULES)/preprocess $< . -RAPHAEL=true > $@
+
+# Combine just Snap.svg theme
+dist/sequence-diagram-snap.js: src/main.js build/diagram-grammar.js src/jquery-plugin.js src/sequence-diagram.js src/theme.js src/theme-snap.js
+	$(NODE_MODULES)/preprocess $< . -SNAP=true > $@
+
+dist/sequence-diagram.css: src/sequence-diagram.css
+	cp $< $@
+
+# Minify the CSS
+dist/sequence-diagram-min.css: dist/sequence-diagram.css
+	$(NODE_MODULES)/minify --output $@ $<
+
+# Move some fonts TODO optomise the fonts
+dist/%.woff: fonts/daniel/%.woff
+	cp $< $@
+
+dist/%.woff2: fonts/daniel/%.woff2
+	cp $< $@
+
+# Minify the final javascript
+dist/%-min.js dist/%-min.js.map: dist/%.js
+
 	#
 	# Please ignore the warnings below (these are in combined js code)
 	#
 	$(NODE_MODULES)/uglifyjs \
-		build/sequence-diagram.js \
-		-o build/sequence-diagram-min.js \
+		$< -o $@ \
 		--compress --comments --lint \
-		--source-map build/sequence-diagram-min.js.map \
-		--source-map-url sequence-diagram-min.js.map
-
-	#
-	# Copy minified file to site
-	#
-	cp build/sequence-diagram-min.js* _site/
+		--source-map $@.map \
+		--source-map-url `basename $<`
